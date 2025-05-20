@@ -24,7 +24,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000" // default fallback
+		port = "3000"
 	}
 
 	app.Listen(":" + port)
