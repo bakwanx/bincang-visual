@@ -2,12 +2,19 @@ package main
 
 import (
 	ctrl "bincang-visual/controllers"
+	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("No .env file found or failed to load")
+	}
 	app := fiber.New()
 
 	// Middlewares
@@ -15,5 +22,10 @@ func main() {
 
 	ctrl.WebSocketSignalingController(app)
 
-	app.Listen(":3000")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000" // default fallback
+	}
+
+	app.Listen(":" + port)
 }
