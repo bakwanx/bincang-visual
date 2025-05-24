@@ -159,7 +159,7 @@ Nginx Full (v6) ALLOW Anywhere (v6)
 5349/tcp (v6) ALLOW Anywhere (v6)  
 3478/udp (v6) ALLOW Anywhere (v6)
 
-## Installing nginx
+# Installing nginx
 
 ```
 sudo apt install nginx
