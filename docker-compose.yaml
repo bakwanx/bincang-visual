@@ -1,0 +1,9 @@
+services:
+  app:
+    image: bincang_visual
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: # host:container
+      - 8080:${{ secrets.PORT }}
+    restart: always
