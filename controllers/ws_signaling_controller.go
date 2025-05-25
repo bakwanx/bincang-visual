@@ -59,8 +59,6 @@ func WebSocketSignalingController(app *fiber.App) {
 					}
 
 				}
-				fmt.Println("pesan", len(rooms))
-
 				lock.Unlock()
 				break
 			}
