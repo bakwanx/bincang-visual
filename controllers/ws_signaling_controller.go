@@ -74,7 +74,7 @@ func WebSocketSignalingController(app *fiber.App) {
 
 			switch webSocketMessage.Type {
 			case "join":
-				var requestOffering model.RequestOffering
+				var requestOffering model.RequestOfferingPayload
 				err = json.Unmarshal(webSocketMessage.Payload, &requestOffering)
 				if err != nil {
 					fmt.Println("Error unmarshalling Join: ", err)
@@ -95,7 +95,10 @@ func WebSocketSignalingController(app *fiber.App) {
 					}
 				}
 			case "offer":
-				if err = clients[webSocketMessage.To].WriteMessage(mt, msg); err != nil {
+				var offerPayload model.OfferPayload
+				err = json.Unmarshal(webSocketMessage.Payload, &offerPayload)
+
+				if err = clients[offerPayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
 					clients[username].Close()
 					delete(clients, username)
@@ -107,7 +110,7 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = clients[webSocketMessage.To].WriteMessage(mt, msg); err != nil {
+				if err = clients[sdpPayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
 					clients[username].Close()
 					delete(clients, username)
@@ -119,14 +122,14 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = clients[webSocketMessage.To].WriteMessage(mt, msg); err != nil {
+				if err = clients[iceCandidatePayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
 					clients[username].Close()
 					delete(clients, username)
 				}
 
 			case "leave":
-				var leaveMeeting = model.LeaveMeeting{}
+				var leaveMeeting = model.LeaveMeetingPayload{}
 				err = json.Unmarshal(webSocketMessage.Payload, &leaveMeeting)
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
