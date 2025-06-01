@@ -8,29 +8,35 @@ type WebSocketMessage struct {
 }
 
 type OfferPayload struct {
-	To   string `json:"to,omitempty"`
-	From string `json:"from,omitempty"`
+	UserTarget User `json:"userTarget,omitempty"`
+	UserFrom   User `json:"userFrom,omitempty"`
 }
 
 type RequestOfferingPayload struct {
-	RoomId          string `json:"roomId"`
-	UsernameRequest string `json:"usernameRequest"`
+	RoomId      string `json:"roomId"`
+	UserRequest User   `json:"userRequest"`
 }
 
 type SdpPayload struct {
-	Sdp     string `json:"sdp"`
-	TypeSdp string `json:"typeSdp"`
-	To      string `json:"to,omitempty"`
+	Sdp        string `json:"sdp"`
+	TypeSdp    string `json:"typeSdp"`
+	UserTarget User   `json:"userTarget,omitempty"`
 }
 
 type IceCandidatePayload struct {
 	Candidate     string `json:"candidate"`
 	SdpMLineIndex int    `json:"sdpMLineIndex"`
-	To            string `json:"to,omitempty"`
+	UserTarget    User   `json:"userTarget,omitempty"`
 	SdpMid        string `json:"sdpMid"`
 }
 
 type LeaveMeetingPayload struct {
+	RoomId string `json:"roomId"`
+	User   User   `json:"user"`
+}
+
+type ChatPayload struct {
 	RoomId   string `json:"roomId"`
-	Username string `json:"username"`
+	UserFrom User   `json:"userFrom,omitempty"`
+	Message  string `json:"message,omitempty"`
 }
