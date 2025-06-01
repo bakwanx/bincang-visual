@@ -2,6 +2,7 @@ package main
 
 import (
 	ctrl "bincang-visual/controllers"
+	"bincang-visual/routes"
 	"fmt"
 	"os"
 
@@ -19,6 +20,10 @@ func main() {
 
 	// Middlewares
 	app.Use(logger.New())
+
+	// Routes
+	routes := routes.NewWebSocketDataHandler()
+	routes.RegisterRoutes(app)
 
 	ctrl.WebSocketSignalingController(app)
 

@@ -1,17 +1,29 @@
-project-root/
+/ws-clean-architecture
 ├── cmd/
 │   └── main.go
-├── domain/
-│   └── model/
-│       └── message.go
-├── usecase/
-│   └── websocket_usecase.go
-├── interface/
-│   └── handler/
-│       └── websocket_handler.go
-├── infrastructure/
-│   └── websocket_server.go
+├── internal/
+│   ├── delivery/
+│   │   ├── http/
+│   │   │   ├── handler.go
+│   │   │   └── route.go
+│   │   └── websocket/
+│   │       ├── handler.go
+│   │       └── route.go
+│   ├── domain/
+│   │   ├── model.go
+│   │   ├── http.go
+│   │   ├── websocket.go
+│   │   └── repository.go      <-- ✅ Interface definitions
+│   ├── repository/            <-- ✅ Implementation
+│   │   └── memory/
+│   │       └── chat_repository.go
+│   ├── usecase/
+│   │   ├── http/
+│   │   │   └── http_usecase.go
+│   │   └── websocket/
+│   │       └── websocket_usecase.go
 ├── go.mod
+└── go.sum
 
 // main.go
 package main

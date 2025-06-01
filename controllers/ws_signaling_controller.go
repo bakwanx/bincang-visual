@@ -10,11 +10,13 @@ import (
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
-var clients = make(map[string]*websocket.Conn)
-var rooms = make(map[string]map[string]string)
+var Clients = make(map[string]*websocket.Conn)
+var Rooms = make(map[string]map[string]string)
 var lock = sync.Mutex{}
+var Test = sync.Mutex{}
 
 func WebSocketSignalingController(app *fiber.App) {
 
@@ -32,12 +34,15 @@ func WebSocketSignalingController(app *fiber.App) {
 		var username = c.Query("username")
 		var roomId = c.Query("roomId")
 
+		userId := uuid.New().String()
+
 		lock.Lock()
-		clients[username] = c
-		if rooms[roomId] == nil {
-			rooms[roomId] = map[string]string{}
+		Clients[userId] = c
+		if Rooms[roomId] == nil {
+			Rooms[roomId] = map[string]string{}
 		}
-		rooms[roomId][username] = username
+
+		Rooms[roomId][userId] = username
 		lock.Unlock()
 
 		for {
@@ -45,8 +50,8 @@ func WebSocketSignalingController(app *fiber.App) {
 			mt, msg, err := c.ReadMessage()
 			if err != nil {
 				lock.Lock()
-				delete(clients, username)
-				for i, room := range rooms {
+				delete(Clients, username)
+				for i, room := range Rooms {
 					for _, usrName := range room {
 						if usrName == username {
 							delete(room, usrName)
@@ -55,7 +60,7 @@ func WebSocketSignalingController(app *fiber.App) {
 
 					// remove roomId
 					if len(room) == 0 {
-						delete(rooms, room[i])
+						delete(Rooms, room[i])
 					}
 
 				}
@@ -79,15 +84,15 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling Join: ", err)
 				}
-				if rooms[requestOffering.RoomId] != nil {
-					if len(rooms[requestOffering.RoomId]) > 1 {
-						for _, username := range rooms[requestOffering.RoomId] {
+				if Rooms[requestOffering.RoomId] != nil {
+					if len(Rooms[requestOffering.RoomId]) > 1 {
+						for _, username := range Rooms[requestOffering.RoomId] {
 							if username != requestOffering.UsernameRequest {
-								if clients[username] != nil {
-									if err = clients[username].WriteMessage(mt, msg); err != nil {
+								if Clients[username] != nil {
+									if err = Clients[username].WriteMessage(mt, msg); err != nil {
 										log.Println("error send message:", err)
-										clients[username].Close()
-										delete(clients, username)
+										Clients[username].Close()
+										delete(Clients, username)
 									}
 								}
 							}
@@ -98,10 +103,10 @@ func WebSocketSignalingController(app *fiber.App) {
 				var offerPayload model.OfferPayload
 				err = json.Unmarshal(webSocketMessage.Payload, &offerPayload)
 
-				if err = clients[offerPayload.To].WriteMessage(mt, msg); err != nil {
+				if err = Clients[offerPayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					clients[username].Close()
-					delete(clients, username)
+					Clients[username].Close()
+					delete(Clients, username)
 				}
 
 			case "answer":
@@ -110,10 +115,10 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = clients[sdpPayload.To].WriteMessage(mt, msg); err != nil {
+				if err = Clients[sdpPayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					clients[username].Close()
-					delete(clients, username)
+					Clients[username].Close()
+					delete(Clients, username)
 				}
 
 			case "candidate":
@@ -122,10 +127,10 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = clients[iceCandidatePayload.To].WriteMessage(mt, msg); err != nil {
+				if err = Clients[iceCandidatePayload.To].WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					clients[username].Close()
-					delete(clients, username)
+					Clients[username].Close()
+					delete(Clients, username)
 				}
 
 			case "leave":
@@ -134,17 +139,17 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if rooms[leaveMeeting.RoomId] != nil {
-					for _, username := range rooms[leaveMeeting.RoomId] {
+				if Rooms[leaveMeeting.RoomId] != nil {
+					for _, username := range Rooms[leaveMeeting.RoomId] {
 						if username != leaveMeeting.Username {
-							if err = clients[username].WriteMessage(mt, msg); err != nil {
+							if err = Clients[username].WriteMessage(mt, msg); err != nil {
 								log.Println("error send message:", err)
-								clients[username].Close()
-								delete(clients, username)
+								Clients[username].Close()
+								delete(Clients, username)
 							}
 						}
 					}
-					delete(rooms[leaveMeeting.RoomId], leaveMeeting.Username)
+					delete(Rooms[leaveMeeting.RoomId], leaveMeeting.Username)
 				}
 
 			}
