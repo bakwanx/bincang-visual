@@ -14,13 +14,13 @@ type OfferPayload struct {
 
 type RequestOfferingPayload struct {
 	RoomId      string `json:"roomId"`
-	UserRequest User   `json:"userRequest"`
+	UserRequest *User  `json:"userRequest,omitempty"`
 }
 
 type SdpPayload struct {
 	Sdp        string `json:"sdp"`
 	TypeSdp    string `json:"typeSdp"`
-	UserTarget User   `json:"userTarget,omitempty"`
+	UserTarget *User  `json:"userTarget,omitempty"`
 }
 
 type IceCandidatePayload struct {
@@ -32,7 +32,7 @@ type IceCandidatePayload struct {
 
 type LeaveMeetingPayload struct {
 	RoomId string `json:"roomId"`
-	User   User   `json:"user"`
+	User   User   `json:"user,omitempty"`
 }
 
 type ChatPayload struct {
