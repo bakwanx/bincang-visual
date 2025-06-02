@@ -1,6 +1,8 @@
 module bincang-visual
 
-go 1.21.5
+go 1.22.4
+
+toolchain go1.24.3
 
 require (
 	github.com/gofiber/contrib/websocket v1.3.4
@@ -10,6 +12,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/fasthttp/websocket v1.5.8 // indirect
+	github.com/fiber/cron v0.0.0-20240905073639-e6f50f7f5b63 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect

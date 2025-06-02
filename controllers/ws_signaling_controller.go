@@ -33,7 +33,10 @@ func WebSocketSignalingController(app *fiber.App) {
 		var roomId = c.Query("roomId")
 
 		lock.Lock()
-		ds.Clients[userId] = c
+		ds.Clients[userId] = &model.UserClient{
+			ID:   userId,
+			Conn: c,
+		}
 		if ds.Rooms[roomId] == nil {
 			ds.Rooms[roomId] = map[string]model.User{}
 		}
@@ -85,10 +88,10 @@ func WebSocketSignalingController(app *fiber.App) {
 					if len(ds.Rooms[requestOffering.RoomId]) > 1 {
 						for _, user := range ds.Rooms[requestOffering.RoomId] {
 							if user.ID != requestOffering.UserRequest.ID {
-								if ds.Clients[user.ID] != nil {
-									if err = ds.Clients[user.ID].WriteMessage(mt, msg); err != nil {
+								if ds.Clients[user.ID].Conn != nil {
+									if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
 										log.Println("error send message:", err)
-										ds.Clients[user.ID].Close()
+										ds.Clients[user.ID].Conn.Close()
 										delete(ds.Clients, user.ID)
 									}
 								}
@@ -100,9 +103,9 @@ func WebSocketSignalingController(app *fiber.App) {
 				var offerPayload model.OfferPayload
 				err = json.Unmarshal(webSocketMessage.Payload, &offerPayload)
 
-				if err = ds.Clients[offerPayload.UserTarget.ID].WriteMessage(mt, msg); err != nil {
+				if err = ds.Clients[offerPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					ds.Clients[offerPayload.UserTarget.ID].Close()
+					ds.Clients[offerPayload.UserTarget.ID].Conn.Close()
 					delete(ds.Clients, offerPayload.UserTarget.ID)
 				}
 
@@ -112,9 +115,9 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = ds.Clients[sdpPayload.UserTarget.ID].WriteMessage(mt, msg); err != nil {
+				if err = ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					ds.Clients[sdpPayload.UserTarget.ID].Close()
+					ds.Clients[sdpPayload.UserTarget.ID].Conn.Close()
 					delete(ds.Clients, sdpPayload.UserTarget.ID)
 				}
 
@@ -124,9 +127,9 @@ func WebSocketSignalingController(app *fiber.App) {
 				if err != nil {
 					fmt.Println("Error unmarshalling sdp payload: ", err)
 				}
-				if err = ds.Clients[iceCandidatePayload.UserTarget.ID].WriteMessage(mt, msg); err != nil {
+				if err = ds.Clients[iceCandidatePayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					ds.Clients[iceCandidatePayload.UserTarget.ID].Close()
+					ds.Clients[iceCandidatePayload.UserTarget.ID].Conn.Close()
 					delete(ds.Clients, iceCandidatePayload.UserTarget.ID)
 				}
 			case "chat":
@@ -137,9 +140,9 @@ func WebSocketSignalingController(app *fiber.App) {
 				}
 				for _, user := range ds.Rooms[chat.RoomId] {
 					if user.ID != chat.UserFrom.ID {
-						if err = ds.Clients[user.ID].WriteMessage(mt, msg); err != nil {
+						if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
 							log.Println("error send message:", err)
-							ds.Clients[user.ID].Close()
+							ds.Clients[user.ID].Conn.Close()
 							delete(ds.Clients, user.ID)
 						}
 					}
@@ -154,9 +157,9 @@ func WebSocketSignalingController(app *fiber.App) {
 				if ds.Rooms[leaveMeeting.RoomId] != nil {
 					for _, user := range ds.Rooms[leaveMeeting.RoomId] {
 						if user.ID != leaveMeeting.User.ID {
-							if err = ds.Clients[user.ID].WriteMessage(mt, msg); err != nil {
+							if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
 								log.Println("error send message:", err)
-								ds.Clients[user.ID].Close()
+								ds.Clients[user.ID].Conn.Close()
 								delete(ds.Clients, user.ID)
 							}
 						}

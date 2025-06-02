@@ -3,6 +3,7 @@ package main
 import (
 	ctrl "bincang-visual/controllers"
 	"bincang-visual/routes"
+	"bincang-visual/service"
 	"fmt"
 	"os"
 
@@ -24,6 +25,10 @@ func main() {
 	// Routes
 	routes := routes.NewWebSocketDataHandler()
 	routes.RegisterRoutes(app)
+
+	// Service
+	service := service.NewService()
+	service.CheckAndRemoveData()
 
 	ctrl.WebSocketSignalingController(app)
 
