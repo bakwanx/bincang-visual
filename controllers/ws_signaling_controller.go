@@ -100,13 +100,13 @@ func WebSocketSignalingController(app *fiber.App) {
 					}
 				}
 			case "offer":
-				var offerPayload model.OfferPayload
-				err = json.Unmarshal(webSocketMessage.Payload, &offerPayload)
+				var sdpPayload = model.SdpPayload{}
+				err = json.Unmarshal(webSocketMessage.Payload, &sdpPayload)
 
-				if err = ds.Clients[offerPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
+				if err = ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
-					ds.Clients[offerPayload.UserTarget.ID].Conn.Close()
-					delete(ds.Clients, offerPayload.UserTarget.ID)
+					ds.Clients[sdpPayload.UserTarget.ID].Conn.Close()
+					delete(ds.Clients, sdpPayload.UserTarget.ID)
 				}
 
 			case "answer":
