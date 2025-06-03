@@ -44,7 +44,6 @@ func WebSocketSignalingController(app *fiber.App) {
 		lock.Unlock()
 
 		for {
-
 			mt, msg, err := c.ReadMessage()
 			if err != nil {
 				lock.Lock()
