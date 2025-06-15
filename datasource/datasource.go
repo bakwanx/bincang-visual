@@ -5,8 +5,9 @@ import (
 )
 
 var Clients = make(map[string]*model.UserClient)
-var Rooms = make(map[string]map[string]model.User)
-var Users = make(map[string]model.User)
+
+// var Rooms = make(map[string]map[string]model.User)
+// var Users = make(map[string]model.User)
 
 // {
 // 	"roomId1": {

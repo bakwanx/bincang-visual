@@ -1,41 +1,13 @@
 package main
 
 import (
-	ctrl "bincang-visual/controllers"
-	"bincang-visual/routes"
-	"bincang-visual/service"
-	"fmt"
-	"os"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/joho/godotenv"
+	"bincang-visual/server"
+	"log"
 )
 
 func main() {
-	err := godotenv.Load()
+	err := server.Run()
 	if err != nil {
-		fmt.Println("No .env file found or failed to load")
+		log.Fatal("server error, %s", err.Error())
 	}
-	app := fiber.New()
-
-	// Middlewares
-	app.Use(logger.New())
-
-	// Routes
-	routes := routes.NewWebSocketDataHandler()
-	routes.RegisterRoutes(app)
-
-	// Service
-	service := service.NewService()
-	service.CheckAndRemoveData()
-
-	ctrl.WebSocketSignalingController(app)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	app.Listen(":" + port)
 }
