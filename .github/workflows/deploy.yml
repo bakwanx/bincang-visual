@@ -9,9 +9,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      REDIS_URL: ${{ secrets.REDIS_URL }}
-      REDIS_PASS: ${{ secrets.REDIS_PASS }}
     steps:   
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
