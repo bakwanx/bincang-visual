@@ -25,7 +25,6 @@ func Run() error {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("No .env file found or failed to load")
-		return err
 	}
 
 	rdb := redis.NewClient(&redis.Options{
