@@ -21,8 +21,8 @@ jobs:
           git pull origin master
           go test -v ./..
 
-          export REDIS_URL=${{ secrets.REDIS_URL }}
-          export REDIS_PASS=${{ secrets.REDIS_PASS }}
+          echo "REDIS_URL=redis:6379" > .env
+          echo "REDIS_PASS=${{ secrets.REDIS_PASS }}" >> .env
           
           docker compose stop golang_app
           docker compose rm -f golang_app
