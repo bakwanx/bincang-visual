@@ -9,6 +9,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      REDIS_PASS: ${{ secrets.REDIS_PASS }}
     steps:   
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
@@ -21,7 +24,11 @@ jobs:
           git pull origin master
           go test -v ./..
 
-          echo "REDIS_URL=${{secrets.REDIS_URL}}" > .env
-          echo "REDIS_PASS=${{secrets.REDIS_PASS}}" >> .env
+          export REDIS_URL=${{ secrets.REDIS_URL }}
+          export REDIS_PASS=${{ secrets.REDIS_PASS }}
           
-          docker compose down && docker compose up --build -d --remove-orphans
+          docker compose stop golang_app
+          docker compose rm -f golang_app
+
+          docker compose build golang_app
+          docker compose up -d --no-deps golang_app

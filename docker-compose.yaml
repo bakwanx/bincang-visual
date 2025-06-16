@@ -1,5 +1,13 @@
 services:
-  app:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASS=${REDIS_PASS}
+
+  golang_app:
     image: bincang_visual
     container_name: bincang_visual
     build:
@@ -7,11 +15,15 @@ services:
       dockerfile: Dockerfile
     ports: # host:container
       - 8080:8080
-    restart: always
     environment:
       - REDIS_URL=${REDIS_URL}
       - REDIS_PASS=${REDIS_PASS}
+    restart: always
+    depends_on:
+      - redis
+    networks:
+      - my_network
 
 networks:
   bincang_net:
-    external: true
+    driver: bridge
