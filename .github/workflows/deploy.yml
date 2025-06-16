@@ -15,7 +15,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        redis_url: ${{ secrets.REDIS_URL }}
+        redis_pass: ${{ secrets.REDIS_PASS }}
         script: |
           cd /home/farhan/go/src/bincang-visual
           git pull origin master
