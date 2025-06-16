@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY go.mod /app
 COPY go.sum /app
-RUN go mod download
+RUN go mod tidy
 
 ## We copy everything in the root directory
 ## into our /app directory

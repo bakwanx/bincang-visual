@@ -6,6 +6,8 @@ services:
       - "6379:6379"
     environment:
       - REDIS_PASS=${REDIS_PASS}
+    networks:
+      - bincang_net
 
   golang_app:
     image: bincang_visual
