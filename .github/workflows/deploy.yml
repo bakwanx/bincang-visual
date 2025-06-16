@@ -27,4 +27,8 @@ jobs:
           echo "REDIS_URL=${REDIS_URL}" > .env
           echo "REDIS_PASS=${REDIS_PASS}" >> .env
           
-          docker compose down && docker compose up --build -d --remove-orphans
+          docker compose stop app
+          docker compose rm -f app
+
+          docker compose build app
+          docker compose up -d --no-deps app
