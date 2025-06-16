@@ -55,7 +55,7 @@ func (i httpDataHandlerImpl) GetRoom(c *fiber.Ctx) error {
 	roomId := c.Query("roomId")
 	result, err := i.roomUsecase.GetRoom(roomId)
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "room not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
@@ -82,7 +82,7 @@ func (i httpDataHandlerImpl) RegisterUser(c *fiber.Ctx) error {
 	}
 	result, err := i.userUsecase.RegisterUser(userModel.Username)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Failed register"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 	}
 	return c.Status(fiber.StatusOK).JSON(result)
 }
@@ -92,7 +92,7 @@ func (i httpDataHandlerImpl) GetUser(c *fiber.Ctx) error {
 	result, err := i.userUsecase.GetUser(userId)
 
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Failed get user"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	}
 	// users := ds.Users
 	// if len(users) != 0 {
