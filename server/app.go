@@ -28,9 +28,9 @@ func Run() error {
 	}
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_URL"),
-		Password: "", // No password set
-		DB:       0,  // Use default DB
+		Addr:     "localhost:6379",
+		Password: os.Getenv("REDIS_PASS"),
+		DB:       0, // Use default DB
 	})
 
 	app := fiber.New()
