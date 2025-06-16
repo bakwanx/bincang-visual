@@ -7,3 +7,14 @@ services:
     ports: # host:container
       - 8080:8080
     restart: always
+    environment:
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_PASS=${REDIS_PASS}
+    depends_on:
+      - redis
+    networks:
+      - bincang_net
+
+networks:
+  bincang_net:
+    external: true

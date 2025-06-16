@@ -9,11 +9,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      REDIS_PASS: ${{ secrets.REDIS_PASS }}
     steps:   
-    - name: Copy .env from secrets
-      run: |
-        echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
-        echo "REDIS_PASS=${{ secrets.REDIS_PASS }}" >> .env
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
       with:
