@@ -1,14 +1,4 @@
 services:
-  redis:
-    image: redis
-    container_name: redis
-    command: redis-server --requirepass ${REDIS_PASS}
-    ports:
-      - "6379:6379"
-    environment:
-      - REDIS_URL=${REDIS_URL}
-      - REDIS_PASS=${REDIS_PASS}
-
   app:
     image: bincang_visual
     container_name: bincang_visual
