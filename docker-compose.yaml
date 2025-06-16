@@ -22,7 +22,7 @@ services:
     depends_on:
       - redis
     networks:
-      - my_network
+      - bincang_net
 
 networks:
   bincang_net:
