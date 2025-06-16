@@ -23,4 +23,8 @@ jobs:
           cd /home/farhan/go/src/bincang-visual
           git pull origin master
           go test -v ./..
+
+          echo "REDIS_URL=${REDIS_URL}" > .env
+          echo "REDIS_PASS=${REDIS_PASS}" >> .env
+          
           docker compose down && docker compose up --build -d --remove-orphans
