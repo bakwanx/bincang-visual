@@ -37,7 +37,7 @@ func Run() error {
 	ctx := context.Background()
 	_, err = rdb.Ping(ctx).Result()
 	if err != nil {
-		fmt.Sprintf("Redis connection failed: %v", err)
+		panic(fmt.Sprintf("Redis connection failed: %v", err))
 	}
 
 	app := fiber.New()

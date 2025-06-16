@@ -23,5 +23,12 @@ jobs:
 
           export REDIS_URL=${{ secrets.REDIS_URL }}
           export REDIS_PASS=${{ secrets.REDIS_PASS }}
+          
+          docker compose stop golang_app
+          docker compose rm -f golang_app
 
-          docker compose down && docker compose up --build -d --remove-orphans
+          docker compose build golang_app
+          docker compose up -d --no-deps golang_app
+
+          # only run for the first time (because it should run redis also)
+          # docker compose down && docker compose up --build -d --remove-orphans
