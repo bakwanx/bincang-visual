@@ -24,8 +24,8 @@ jobs:
           git pull origin master
           go test -v ./..
 
-          echo "REDIS_URL=${REDIS_URL}" > .env
-          echo "REDIS_PASS=${REDIS_PASS}" >> .env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" > .env
+          echo "REDIS_PASS=${{secrets.REDIS_PASS}}" >> .env
           
           docker compose stop app
           docker compose rm -f app
