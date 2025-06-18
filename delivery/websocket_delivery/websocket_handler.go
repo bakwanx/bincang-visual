@@ -69,7 +69,7 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 	// }
 
 	if err := i.roomUsecase.AddUser(roomId, *userModel); err != nil {
-		fmt.Println("pesan 1", err)
+		fmt.Println("[ERROR] error adding user: ", err)
 	}
 	// ds.Rooms[roomId][userId] = ds.Users[userId]
 	lock.Unlock()
@@ -82,13 +82,13 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 
 			// remove user in room
 			if err := i.roomUsecase.RemoveUser(roomId, userId); err != nil {
-				fmt.Println("pesan 3", err)
+				fmt.Println("[ERROR] error remove user from room: ", err)
 			}
 
 			// delete(ds.Users, userId)
 			// remove user in users
 			if err := i.userUsecase.RemoveUser(userId); err != nil {
-				fmt.Println("pesan 2", err)
+				fmt.Println("[ERROR] error remove user from users: ", err)
 			}
 
 			lock.Unlock()
@@ -229,6 +229,24 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 
 		lock.Unlock()
 	}
+}
+
+func removeUser(roomUsecase usecase.RoomUsecase, userUsecase usecase.UserUsecase, roomId string, userId string) {
+	// close connection
+	ds.Clients[userId].Conn.Close()
+
+	// remove user in room
+	if err := roomUsecase.RemoveUser(roomId, userId); err != nil {
+		fmt.Println("[ERROR] remove user", err)
+	}
+
+	// remove user in users
+	if err := userUsecase.RemoveUser(userId); err != nil {
+		fmt.Println("[ERROR] remove user", err)
+	}
+
+	// remove user from clients
+	delete(ds.Clients, userId)
 }
 
 // func WebSocketSignalingController(app *fiber.App) {

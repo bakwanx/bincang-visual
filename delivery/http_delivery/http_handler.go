@@ -43,7 +43,7 @@ func (i httpDataHandlerImpl) RegisterRoutes(app *fiber.App) {
 func (i httpDataHandlerImpl) CreateRoom(c *fiber.Ctx) error {
 	result, err := i.roomUsecase.CreateRoom()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "internal server error"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal server error"})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "room created",
@@ -55,7 +55,7 @@ func (i httpDataHandlerImpl) GetRoom(c *fiber.Ctx) error {
 	roomId := c.Query("roomId")
 	result, err := i.roomUsecase.GetRoom(roomId)
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Room not found"})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bincang-visual/models"
+	"bincang-visual/utils"
 	"context"
 	"encoding/json"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
+
+const userPrefix = "user:"
 
 type UserRepository interface {
 	RegisterUser(username string) (*models.User, error)
@@ -27,8 +30,8 @@ func NewUserRepository(redisClient *redis.Client) UserRepository {
 }
 
 func (r *userRepositoryImpl) RegisterUser(username string) (*models.User, error) {
-	userId := uuid.New().String()
-	ttl := 2 * 24 * time.Hour
+	userId := userPrefix + uuid.New().String()
+	ttl := 1 * 24 * time.Hour
 	currentTime := time.Now()
 	createdAt := currentTime.Format("15:04:05 01-02-2006")
 	userModel := models.User{
@@ -44,21 +47,23 @@ func (r *userRepositoryImpl) RegisterUser(username string) (*models.User, error)
 	if err != nil {
 		return nil, err
 	}
+	userModel.ID = utils.RemovePrefix(userModel.ID, userPrefix)
 	return &userModel, nil
 }
 
 func (r *userRepositoryImpl) GetUser(userId string) (*models.User, error) {
-	result, err := r.redisClient.Get(context.Background(), userId).Bytes()
+	result, err := r.redisClient.Get(context.Background(), userPrefix+userId).Bytes()
 	if err != nil {
 		return nil, err
 	}
-	var user models.User
-	err = json.Unmarshal(result, &user)
-	return &user, nil
+	var userModel models.User
+	err = json.Unmarshal(result, &userModel)
+	userModel.ID = utils.RemovePrefix(userModel.ID, userPrefix)
+	return &userModel, nil
 }
 
 func (r *userRepositoryImpl) RemoveUser(userId string) error {
-	err := r.redisClient.Del(context.Background(), userId).Err()
+	err := r.redisClient.Del(context.Background(), userPrefix+userId).Err()
 	if err != nil {
 		return err
 	}

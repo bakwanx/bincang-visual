@@ -11,6 +11,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const roomPrefix = "room:"
+
 type RoomRepository interface {
 	CreateRoom() (*models.Room, error)
 	GetRoom(roomId string) (*models.Room, error)
@@ -27,10 +29,12 @@ func NewRoomRepository(redisClient *redis.Client) RoomRepository {
 }
 
 func (r roomRepositoryImpl) CreateRoom() (*models.Room, error) {
-	// roomId := uuid.New().String()
-	roomId := utils.GenerateRandomString()
-	ttl := 2 * 24 * time.Hour
+	roomId, err := utils.GenerateUniqueKey(r.redisClient, roomPrefix)
+	if err != nil {
+		return nil, err
+	}
 
+	ttl := 1 * 24 * time.Hour
 	// ttl := 20 * time.Second
 	currentTime := time.Now()
 	createdAt := currentTime.Format("15:04:05 01-02-2006")
@@ -52,13 +56,14 @@ func (r roomRepositoryImpl) CreateRoom() (*models.Room, error) {
 	}
 
 	return &models.Room{
-		RoomId:    roomId,
+		RoomId:    utils.RemovePrefix(roomId, roomPrefix),
 		CreatedAt: createdAt,
 	}, nil
 }
 
 func (r roomRepositoryImpl) GetRoom(roomId string) (*models.Room, error) {
-	val, err := r.redisClient.Get(context.Background(), roomId).Bytes()
+	key := roomPrefix + roomId
+	val, err := r.redisClient.Get(context.Background(), key).Bytes()
 	if err != nil {
 		fmt.Println("Redis error: ", err)
 		return nil, err
@@ -69,15 +74,14 @@ func (r roomRepositoryImpl) GetRoom(roomId string) (*models.Room, error) {
 	if err != nil {
 		fmt.Println("Error unmarshalling Join: ", err)
 	}
-
+	roomObj.RoomId = utils.RemovePrefix(roomObj.RoomId, roomPrefix)
 	return &roomObj, nil
 }
 
 func (r roomRepositoryImpl) AddUser(roomId string, userModel models.User) error {
-	key := roomId
+	key := roomPrefix + roomId
 
-	// Get room JSON
-	val, err := r.redisClient.Get(context.Background(), roomId).Bytes()
+	val, err := r.redisClient.Get(context.Background(), key).Bytes()
 	if err != nil {
 		return err
 	}
@@ -103,7 +107,7 @@ func (r roomRepositoryImpl) AddUser(roomId string, userModel models.User) error 
 }
 
 func (r roomRepositoryImpl) RemoveUser(roomId, userId string) error {
-	key := roomId
+	key := roomPrefix + roomId
 	val, err := r.redisClient.Get(context.Background(), key).Bytes()
 	if err != nil {
 		return err
