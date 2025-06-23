@@ -39,10 +39,12 @@ func (r roomRepositoryImpl) CreateRoom() (*models.Room, error) {
 	currentTime := time.Now()
 	createdAt := currentTime.Format("15:04:05 01-02-2006")
 
-	roomJson, err := json.Marshal(models.Room{
+	creatRoom := models.Room{
 		RoomId:    roomId,
 		CreatedAt: createdAt,
-	})
+		Users:     map[string]models.User{},
+	}
+	roomJson, err := json.Marshal(creatRoom)
 
 	if err != nil {
 		fmt.Println("Error marshalling", err)
@@ -55,10 +57,8 @@ func (r roomRepositoryImpl) CreateRoom() (*models.Room, error) {
 		return nil, err
 	}
 
-	return &models.Room{
-		RoomId:    utils.RemovePrefix(roomId, roomPrefix),
-		CreatedAt: createdAt,
-	}, nil
+	creatRoom.RoomId = utils.RemovePrefix(roomId, roomPrefix)
+	return &creatRoom, nil
 }
 
 func (r roomRepositoryImpl) GetRoom(roomId string) (*models.Room, error) {

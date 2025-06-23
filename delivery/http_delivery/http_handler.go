@@ -36,7 +36,7 @@ func (i httpDataHandlerImpl) RegisterRoutes(app *fiber.App) {
 	// app.Get("/users", i.GetUsers)
 	app.Get("/user", i.GetUser)
 
-	app.Get("/create-room", i.CreateRoom)
+	app.Post("/create-room", i.CreateRoom)
 	app.Get("/room", i.GetRoom)
 }
 
