@@ -107,8 +107,7 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 		switch webSocketMessage.Type {
 		case "join":
 			var requestOffering model.RequestOfferingPayload
-			err := json.Unmarshal(webSocketMessage.Payload, &requestOffering)
-			if err != nil {
+			if err := json.Unmarshal(webSocketMessage.Payload, &requestOffering); err != nil {
 				fmt.Println("Error unmarshalling Join: ", err)
 			}
 			room, err := i.roomUsecase.GetRoom(requestOffering.RoomId)
@@ -156,11 +155,10 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 
 		case "answer":
 			var sdpPayload = model.SdpPayload{}
-			err = json.Unmarshal(webSocketMessage.Payload, &sdpPayload)
-			if err != nil {
+			if err = json.Unmarshal(webSocketMessage.Payload, &sdpPayload); err != nil {
 				fmt.Println("Error unmarshalling sdp payload: ", err)
 			}
-			if err = ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
+			if err := ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
 				log.Println("error send message:", err)
 				ds.Clients[sdpPayload.UserTarget.ID].Conn.Close()
 				delete(ds.Clients, sdpPayload.UserTarget.ID)
@@ -168,8 +166,7 @@ func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
 
 		case "candidate":
 			var iceCandidatePayload = model.IceCandidatePayload{}
-			err = json.Unmarshal(webSocketMessage.Payload, &iceCandidatePayload)
-			if err != nil {
+			if err := json.Unmarshal(webSocketMessage.Payload, &iceCandidatePayload); err != nil {
 				fmt.Println("Error unmarshalling sdp payload: ", err)
 			}
 			if err = ds.Clients[iceCandidatePayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
