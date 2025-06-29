@@ -42,7 +42,6 @@ func (r roomRepositoryImpl) CreateRoom() (*models.Room, error) {
 	creatRoom := models.Room{
 		RoomId:    roomId,
 		CreatedAt: createdAt,
-		Users:     map[string]models.User{},
 	}
 	roomJson, err := json.Marshal(creatRoom)
 

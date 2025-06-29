@@ -9,11 +9,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func GenerateRandomString() string {
+func GenerateRandomString(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	result := make([]byte, 5)
+	result := make([]byte, length)
 	for i := range result {
 		result[i] = charset[rand.Intn(len(charset))]
 	}
@@ -22,7 +22,7 @@ func GenerateRandomString() string {
 
 func GenerateUniqueKey(redisClient *redis.Client, prefix string) (string, error) {
 	for {
-		randomStr := GenerateRandomString()
+		randomStr := fmt.Sprintf("%s-%s-%s", GenerateRandomString(3), GenerateRandomString(4), GenerateRandomString(3))
 
 		key := fmt.Sprintf("%s%s", prefix, randomStr)
 
