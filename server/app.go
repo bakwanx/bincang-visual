@@ -52,10 +52,11 @@ func Run() error {
 	// Usecase initialization
 	roomUsecase := usecase.NewRoomUsecase(roomRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo)
+	websocketUsecase := usecase.NewWebsocketUsecase(userRepo, roomRepo)
 
 	// Handle
 	httpHandle := httpdelivery.NewHtppDataHandler(*roomUsecase, *userUsecase)
-	websocketHandle := websocketdelivery.NewWebSocketHandler(*userUsecase, *roomUsecase)
+	websocketHandle := websocketdelivery.NewWebSocketHandler(*userUsecase, *roomUsecase, *websocketUsecase)
 	httpHandle.RegisterRoutes(app)
 	websocketHandle.RegisterWebSocket(app)
 

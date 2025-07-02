@@ -17,7 +17,6 @@ func NewUserUsecase(userRepo repository.UserRepository) *UserUsecase {
 
 func (u *UserUsecase) RegisterUser(username string) (*models.User, error) {
 	return u.userRepo.RegisterUser(username)
-
 }
 
 func (u *UserUsecase) GetUser(userId string) (*models.User, error) {
