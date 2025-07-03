@@ -48,14 +48,17 @@ func Run() error {
 	// Repository initialization
 	roomRepo := repository.NewRoomRepository(rdb)
 	userRepo := repository.NewUserRepository(rdb)
+	coturnRepo := repository.NewCoturnConfigurationRepository(rdb)
 
 	// Usecase initialization
 	roomUsecase := usecase.NewRoomUsecase(roomRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo)
+	coturnUsecase := usecase.NewCoturnConfigurationUsecase(coturnRepo)
+	websocketUsecase := usecase.NewWebsocketUsecase(userRepo, roomRepo)
 
 	// Handle
-	httpHandle := httpdelivery.NewHtppDataHandler(*roomUsecase, *userUsecase)
-	websocketHandle := websocketdelivery.NewWebSocketHandler(*userUsecase, *roomUsecase)
+	httpHandle := httpdelivery.NewHtppDataHandler(*roomUsecase, *userUsecase, *coturnUsecase)
+	websocketHandle := websocketdelivery.NewWebSocketHandler(*userUsecase, *roomUsecase, *websocketUsecase)
 	httpHandle.RegisterRoutes(app)
 	websocketHandle.RegisterWebSocket(app)
 

@@ -18,14 +18,16 @@ type HttpDataHandler interface {
 }
 
 type httpDataHandlerImpl struct {
-	roomUsecase usecase.RoomUsecase
-	userUsecase usecase.UserUsecase
+	roomUsecase                usecase.RoomUsecase
+	userUsecase                usecase.UserUsecase
+	coturnConfigurationUsecase usecase.CoturnConfigurationUsecase
 }
 
-func NewHtppDataHandler(roomUsecase usecase.RoomUsecase, userUsecase usecase.UserUsecase) HttpDataHandler {
+func NewHtppDataHandler(roomUsecase usecase.RoomUsecase, userUsecase usecase.UserUsecase, coturnConfigurationUsecase usecase.CoturnConfigurationUsecase) HttpDataHandler {
 	return &httpDataHandlerImpl{
-		roomUsecase: roomUsecase,
-		userUsecase: userUsecase,
+		roomUsecase:                roomUsecase,
+		userUsecase:                userUsecase,
+		coturnConfigurationUsecase: coturnConfigurationUsecase,
 	}
 }
 
@@ -38,6 +40,7 @@ func (i httpDataHandlerImpl) RegisterRoutes(app *fiber.App) {
 
 	app.Post("/create-room", i.CreateRoom)
 	app.Get("/room", i.GetRoom)
+	app.Get("/coturn", i.GetCoturnConfiguration)
 }
 
 func (i httpDataHandlerImpl) CreateRoom(c *fiber.Ctx) error {
@@ -56,6 +59,17 @@ func (i httpDataHandlerImpl) GetRoom(c *fiber.Ctx) error {
 	result, err := i.roomUsecase.GetRoom(roomId)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Room not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
+		"data":    result,
+	})
+}
+
+func (i httpDataHandlerImpl) GetCoturnConfiguration(c *fiber.Ctx) error {
+	result, err := i.coturnConfigurationUsecase.GetConfiguration()
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Failed to retrieve configurations"})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",

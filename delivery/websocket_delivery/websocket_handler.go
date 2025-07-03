@@ -1,13 +1,10 @@
 package websocketdelivery
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"sync"
 
 	ds "bincang-visual/datasource"
-	model "bincang-visual/models"
 	"bincang-visual/usecase"
 
 	"github.com/gofiber/contrib/websocket"
@@ -22,14 +19,16 @@ type WebSocketHandler interface {
 }
 
 type websocketHandlerImpl struct {
-	userUsecase usecase.UserUsecase
-	roomUsecase usecase.RoomUsecase
+	userUsecase      usecase.UserUsecase
+	roomUsecase      usecase.RoomUsecase
+	websocketUsecase usecase.WebsocketUsecase
 }
 
-func NewWebSocketHandler(userUsecase usecase.UserUsecase, roomUsecase usecase.RoomUsecase) WebSocketHandler {
+func NewWebSocketHandler(userUsecase usecase.UserUsecase, roomUsecase usecase.RoomUsecase, websocketUsecase usecase.WebsocketUsecase) WebSocketHandler {
 	return &websocketHandlerImpl{
-		userUsecase: userUsecase,
-		roomUsecase: roomUsecase,
+		userUsecase:      userUsecase,
+		roomUsecase:      roomUsecase,
+		websocketUsecase: websocketUsecase,
 	}
 }
 
@@ -49,183 +48,7 @@ func (i websocketHandlerImpl) RegisterWebSocket(app *fiber.App) {
 }
 
 func (i websocketHandlerImpl) WebSocketSignalingController(c *websocket.Conn) {
-
-	var userId = c.Query("userId")
-	var roomId = c.Query("roomId")
-	userModel, err := i.userUsecase.GetUser(userId)
-
-	if err != nil {
-		fmt.Println(userId)
-		fmt.Println("pesan 0", err)
-	}
-
-	lock.Lock()
-	ds.Clients[userId] = &model.UserClient{
-		ID:   userId,
-		Conn: c,
-	}
-	// if ds.Rooms[roomId] == nil {
-	// 	ds.Rooms[roomId] = map[string]model.User{}
-	// }
-
-	if err := i.roomUsecase.AddUser(roomId, *userModel); err != nil {
-		fmt.Println("[ERROR] error adding user: ", err)
-	}
-	// ds.Rooms[roomId][userId] = ds.Users[userId]
-	lock.Unlock()
-
-	for {
-		mt, msg, err := c.ReadMessage()
-		if err != nil {
-			lock.Lock()
-			delete(ds.Clients, userId)
-
-			// remove user in room
-			if err := i.roomUsecase.RemoveUser(roomId, userId); err != nil {
-				fmt.Println("[ERROR] error remove user from room: ", err)
-			}
-
-			// delete(ds.Users, userId)
-			// remove user in users
-			if err := i.userUsecase.RemoveUser(userId); err != nil {
-				fmt.Println("[ERROR] error remove user from users: ", err)
-			}
-
-			lock.Unlock()
-			break
-		}
-
-		lock.Lock()
-
-		var webSocketMessage model.WebSocketMessage
-
-		err = json.Unmarshal(msg, &webSocketMessage)
-		if err != nil {
-			fmt.Println("Error unmarshalling SocketMessage: ", err)
-		}
-
-		switch webSocketMessage.Type {
-		case "join":
-			var requestOffering model.RequestOfferingPayload
-			if err := json.Unmarshal(webSocketMessage.Payload, &requestOffering); err != nil {
-				fmt.Println("Error unmarshalling Join: ", err)
-			}
-			room, err := i.roomUsecase.GetRoom(requestOffering.RoomId)
-			if err != nil {
-				fmt.Println(err)
-			}
-			if len(room.Users) > 1 {
-				for _, user := range room.Users {
-					if user.ID != requestOffering.UserRequest.ID {
-						if ds.Clients[user.ID].Conn != nil {
-							if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
-								log.Println("error send message:", err)
-								ds.Clients[user.ID].Conn.Close()
-								delete(ds.Clients, user.ID)
-							}
-						}
-					}
-				}
-			}
-
-			// if ds.Rooms[requestOffering.RoomId] != nil {
-			// 	if len(ds.Rooms[requestOffering.RoomId]) > 1 {
-			// 		for _, user := range ds.Rooms[requestOffering.RoomId] {
-			// 			if user.ID != requestOffering.UserRequest.ID {
-			// 				if ds.Clients[user.ID].Conn != nil {
-			// 					if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
-			// 						log.Println("error send message:", err)
-			// 						ds.Clients[user.ID].Conn.Close()
-			// 						delete(ds.Clients, user.ID)
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
-		case "offer":
-			var sdpPayload = model.SdpPayload{}
-			err = json.Unmarshal(webSocketMessage.Payload, &sdpPayload)
-
-			if err = ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
-				log.Println("error send message:", err)
-				ds.Clients[sdpPayload.UserTarget.ID].Conn.Close()
-				delete(ds.Clients, sdpPayload.UserTarget.ID)
-			}
-
-		case "answer":
-			var sdpPayload = model.SdpPayload{}
-			if err = json.Unmarshal(webSocketMessage.Payload, &sdpPayload); err != nil {
-				fmt.Println("Error unmarshalling sdp payload: ", err)
-			}
-			if err := ds.Clients[sdpPayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
-				log.Println("error send message:", err)
-				ds.Clients[sdpPayload.UserTarget.ID].Conn.Close()
-				delete(ds.Clients, sdpPayload.UserTarget.ID)
-			}
-
-		case "candidate":
-			var iceCandidatePayload = model.IceCandidatePayload{}
-			if err := json.Unmarshal(webSocketMessage.Payload, &iceCandidatePayload); err != nil {
-				fmt.Println("Error unmarshalling sdp payload: ", err)
-			}
-			if err = ds.Clients[iceCandidatePayload.UserTarget.ID].Conn.WriteMessage(mt, msg); err != nil {
-				log.Println("error send message:", err)
-				ds.Clients[iceCandidatePayload.UserTarget.ID].Conn.Close()
-				delete(ds.Clients, iceCandidatePayload.UserTarget.ID)
-			}
-		case "chat":
-			var chat = model.ChatPayload{}
-			if err := json.Unmarshal(webSocketMessage.Payload, &chat); err != nil {
-				fmt.Println("Error unmarshalling sdp payload: ", err)
-			}
-
-			room, err := i.roomUsecase.GetRoom(chat.RoomId)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			for _, user := range room.Users {
-				if user.ID != chat.UserFrom.ID {
-					if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
-						log.Println("error send message:", err)
-						ds.Clients[user.ID].Conn.Close()
-						delete(ds.Clients, user.ID)
-					}
-				}
-			}
-
-		case "leave":
-			var leaveMeeting = model.LeaveMeetingPayload{}
-			if err := json.Unmarshal(webSocketMessage.Payload, &leaveMeeting); err != nil {
-				fmt.Println("Error unmarshalling sdp payload: ", err)
-			}
-
-			room, err := i.roomUsecase.GetRoom(leaveMeeting.RoomId)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			if room != nil {
-				for _, user := range room.Users {
-					if user.ID != leaveMeeting.User.ID {
-						if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
-							log.Println("error send message:", err)
-							ds.Clients[user.ID].Conn.Close()
-							delete(ds.Clients, user.ID)
-						}
-					}
-				}
-				if err := i.roomUsecase.RemoveUser(leaveMeeting.RoomId, leaveMeeting.User.ID); err != nil {
-					fmt.Println(err)
-				}
-
-			}
-
-		}
-
-		lock.Unlock()
-	}
+	i.websocketUsecase.InitWebsocket(c)
 }
 
 func removeUser(roomUsecase usecase.RoomUsecase, userUsecase usecase.UserUsecase, roomId string, userId string) {
