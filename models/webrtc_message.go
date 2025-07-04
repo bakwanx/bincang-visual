@@ -41,6 +41,6 @@ type ChatPayload struct {
 	Message  string `json:"message,omitempty"`
 }
 
-type PingPayload struct {
+type PingPongPayload struct {
 	Message string `json:"message"`
 }

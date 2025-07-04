@@ -75,7 +75,7 @@ func (u *WebsocketUsecase) mainLogic(userId, roomId string, c *websocket.Conn) {
 		}
 
 		switch webSocketMessage.Type {
-		case "pong":
+		case "pingpong":
 			fmt.Printf(string(webSocketMessage.Payload))
 		case "join":
 			u.onJoin(roomId, webSocketMessage, mt, msg, err)
@@ -234,18 +234,28 @@ func (r *WebsocketUsecase) onLeave(webSocketMessage model.WebSocketMessage, mt i
 func (r *WebsocketUsecase) heartbeat(userId string) {
 	go func() {
 		for {
-			pingPayload := model.PingPayload{
-				Message: "Ping",
+			pingPayload := model.PingPongPayload{
+				Message: "ping",
 			}
 
-			jsonBytes, err := json.Marshal(pingPayload)
+			pingBytes, err := json.Marshal(pingPayload)
+			if err != nil {
+				log.Printf("Error marshaling ping payload for client %s: %v", userId, err)
+				break // Exit goroutine
+			}
+			websocketMessage := model.WebSocketMessage{
+				Type:    "pingpong",
+				Payload: pingBytes,
+			}
+
+			websocketBytes, err := json.Marshal(websocketMessage)
 			if err != nil {
 				log.Printf("Error marshaling ping payload for client %s: %v", userId, err)
 				break // Exit goroutine
 			}
 
 			if ds.Clients[userId] != nil {
-				err = ds.Clients[userId].Conn.WriteMessage(websocket.TextMessage, jsonBytes)
+				err = ds.Clients[userId].Conn.WriteMessage(websocket.TextMessage, websocketBytes)
 				if err != nil {
 					log.Printf("Write error (ping) for client %s: %v", userId, err)
 					ds.Clients[userId].Conn.Close()
