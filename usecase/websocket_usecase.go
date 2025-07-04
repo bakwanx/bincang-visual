@@ -75,6 +75,8 @@ func (u *WebsocketUsecase) mainLogic(userId, roomId string, c *websocket.Conn) {
 		}
 
 		switch webSocketMessage.Type {
+		case "pong":
+			fmt.Printf(string(webSocketMessage.Payload))
 		case "join":
 			u.onJoin(roomId, webSocketMessage, mt, msg, err)
 		case "offer":
