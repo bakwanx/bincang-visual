@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	model "bincang-visual/models"
 
@@ -52,10 +53,12 @@ func (u *WebsocketUsecase) InitWebsocket(c *websocket.Conn) {
 	// ds.Rooms[roomId][userId] = ds.Users[userId]
 	lock.Unlock()
 
+	u.heartbeat(userId)
 	u.mainLogic(userId, roomId, c)
 }
 
 func (u *WebsocketUsecase) mainLogic(userId, roomId string, c *websocket.Conn) {
+
 	for {
 		mt, msg, err := c.ReadMessage()
 		isBreak := u.onDisconnect(userId, roomId, mt, msg, err)
@@ -73,7 +76,7 @@ func (u *WebsocketUsecase) mainLogic(userId, roomId string, c *websocket.Conn) {
 
 		switch webSocketMessage.Type {
 		case "join":
-			u.onJoin(userId, roomId, webSocketMessage, mt, msg, err)
+			u.onJoin(roomId, webSocketMessage, mt, msg, err)
 		case "offer":
 			u.onOffer(webSocketMessage, mt, msg, err)
 		case "answer":
@@ -112,7 +115,7 @@ func (u *WebsocketUsecase) onDisconnect(userId, roomId string, mt int, msg []byt
 	return false
 }
 
-func (u *WebsocketUsecase) onJoin(userId, roomId string, webSocketMessage model.WebSocketMessage, mt int, msg []byte, err error) {
+func (u *WebsocketUsecase) onJoin(roomId string, webSocketMessage model.WebSocketMessage, mt int, msg []byte, err error) {
 	var requestOffering model.RequestOfferingPayload
 	if err := json.Unmarshal(webSocketMessage.Payload, &requestOffering); err != nil {
 		fmt.Println("Error unmarshalling Join: ", err)
@@ -224,4 +227,32 @@ func (r *WebsocketUsecase) onLeave(webSocketMessage model.WebSocketMessage, mt i
 
 	}
 
+}
+
+func (r *WebsocketUsecase) heartbeat(userId string) {
+	go func() {
+		for {
+			pingPayload := model.PingPayload{
+				Message: "Ping",
+			}
+
+			jsonBytes, err := json.Marshal(pingPayload)
+			if err != nil {
+				log.Printf("Error marshaling ping payload for client %s: %v", userId, err)
+				break // Exit goroutine
+			}
+
+			if ds.Clients[userId] != nil {
+				err = ds.Clients[userId].Conn.WriteMessage(websocket.TextMessage, jsonBytes)
+				if err != nil {
+					log.Printf("Write error (ping) for client %s: %v", userId, err)
+					ds.Clients[userId].Conn.Close()
+					delete(ds.Clients, userId)
+					break // Exit goroutine
+				}
+			}
+
+			time.Sleep(45 * time.Second)
+		}
+	}()
 }

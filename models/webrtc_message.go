@@ -40,3 +40,7 @@ type ChatPayload struct {
 	UserFrom User   `json:"userFrom,omitempty"`
 	Message  string `json:"message,omitempty"`
 }
+
+type PingPayload struct {
+	Message string `json:"message"`
+}
