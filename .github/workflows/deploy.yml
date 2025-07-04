@@ -24,6 +24,7 @@ jobs:
           export REDIS_PASS=${{ secrets.REDIS_PASS }}
           
           # docker compose stop golang_app
+          docker compose stop golang_app
           docker compose rm -f golang_app
 
           # docker compose build golang_app
