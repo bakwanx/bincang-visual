@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"bincang-visual/models"
 	"bincang-visual/repository"
 )
 
@@ -13,6 +12,6 @@ func NewCoturnConfigurationUsecase(coturnRepo repository.CoturnConfigurationRepo
 	return &CoturnConfigurationUsecase{coturnRepo: coturnRepo}
 }
 
-func (u *CoturnConfigurationUsecase) GetConfiguration() (*models.CoturnConfiguration, error) {
+func (u *CoturnConfigurationUsecase) GetConfiguration() (*string, error) {
 	return u.coturnRepo.GetConfiguration()
 }

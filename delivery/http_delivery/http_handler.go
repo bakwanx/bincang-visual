@@ -4,6 +4,7 @@ import (
 	ds "bincang-visual/datasource"
 	"bincang-visual/models"
 	"bincang-visual/usecase"
+	"bincang-visual/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -71,9 +72,11 @@ func (i httpDataHandlerImpl) GetCoturnConfiguration(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Failed to retrieve configurations"})
 	}
+	encryptedConfiguration, err := utils.EncryptText(*result)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
-		"data":    result,
+		"data":    encryptedConfiguration,
 	})
 }
 
@@ -108,10 +111,6 @@ func (i httpDataHandlerImpl) GetUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	}
-	// users := ds.Users
-	// if len(users) != 0 {
-	// 	return c.Status(fiber.StatusOK).JSON(users)
-	// }
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",

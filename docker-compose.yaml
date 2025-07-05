@@ -21,6 +21,8 @@ services:
     environment:
       - REDIS_URL=redis:6379
       - REDIS_PASS=${REDIS_PASS}
+      - PRIVATE_ENCRYPTOR_KEY=${PRIVATE_ENCRYPTOR_KEY}
+      - IV_PRIVATE_ENCRYPTOR_KEY=${IV_PRIVATE_ENCRYPTOR_KEY}
     restart: always
     depends_on:
       - redis

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"bincang-visual/models"
-	"bincang-visual/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,7 +10,7 @@ import (
 )
 
 type CoturnConfigurationRepository interface {
-	GetConfiguration() (*models.CoturnConfiguration, error)
+	GetConfiguration() (*string, error)
 }
 
 type coturnConfigurationRepositoryImpl struct {
@@ -22,7 +21,7 @@ func NewCoturnConfigurationRepository(redisClient *redis.Client) CoturnConfigura
 	return &coturnConfigurationRepositoryImpl{redisClient: redisClient}
 }
 
-func (r coturnConfigurationRepositoryImpl) GetConfiguration() (*models.CoturnConfiguration, error) {
+func (r coturnConfigurationRepositoryImpl) GetConfiguration() (*string, error) {
 	key := "config:coturn"
 	val, err := r.redisClient.Get(context.Background(), key).Bytes()
 	if err != nil {
@@ -35,23 +34,7 @@ func (r coturnConfigurationRepositoryImpl) GetConfiguration() (*models.CoturnCon
 	if err != nil {
 		fmt.Println("Error unmarshalling Join: ", err)
 	}
+	result := string(val)
 
-	return &coturn, nil
-}
-
-func (r coturnConfigurationRepositoryImpl) GetRoom(roomId string) (*models.Room, error) {
-	key := roomPrefix + roomId
-	val, err := r.redisClient.Get(context.Background(), key).Bytes()
-	if err != nil {
-		fmt.Println("Redis error: ", err)
-		return nil, err
-	}
-
-	var roomObj models.Room
-	err = json.Unmarshal(val, &roomObj)
-	if err != nil {
-		fmt.Println("Error unmarshalling Join: ", err)
-	}
-	roomObj.RoomId = utils.RemovePrefix(roomObj.RoomId, roomPrefix)
-	return &roomObj, nil
+	return &result, nil
 }
