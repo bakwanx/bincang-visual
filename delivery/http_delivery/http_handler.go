@@ -74,6 +74,10 @@ func (i httpDataHandlerImpl) GetCoturnConfiguration(c *fiber.Ctx) error {
 	}
 	encryptedConfiguration, err := utils.EncryptText(*result)
 
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
 		"data":    encryptedConfiguration,
