@@ -2,6 +2,7 @@ services:
   redis:
     image: redis
     container_name: redis
+    command: redis-server --appendonly yes --replica-read-only no
     ports:
       - "6379:6379"
     environment:
