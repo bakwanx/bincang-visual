@@ -31,4 +31,4 @@ services:
 
 networks:
   bincang_net:
-    driver: bridge
+    external: true
