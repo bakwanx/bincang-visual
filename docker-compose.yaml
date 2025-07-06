@@ -32,3 +32,4 @@ services:
 networks:
   bincang_net:
     external: true
+    # driver: bridge ==> use this when using redis in the service
