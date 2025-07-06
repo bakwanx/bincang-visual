@@ -1,19 +1,27 @@
 # Bincang Visual Go
 
-Bincang visual is a web app meeting platform based on Flutter and Go. it allows users to make meeting within a minute without cost, fees and no login required. Just create new meeting and ready to go!
+Bincang Visual is a web-based meeting platform built with Flutter and Go. It allows users to create meetings in seconds—no cost, no fees, and no login required. Simply create a new meeting and you’re ready to go!
 
 This project is still under development.
-But still, you can try for live demo [here](https://bakwanx.github.io/bincang-visual-web/)
+You can try the live demo [here](https://bakwanx.github.io/bincang-visual-web/)
 
 ## Setup Instructions
 
-To use this project, follow this steps:
+Follow these steps to set up the project::
 
-1. **Clone the repository**: Clone this repository to your machine
-2. **Install Golang**: Ensure you have installed Golang on your machine
-3. **Setup**: .env
-4. **Install Dependencies**: Navigate to the project directory and install the required dependencies
-5. **Setup Redis**: Setup redis and add new key "config:coturn" and fill the value with this format
+1. **Clone the repository**: Clone this repository to your local machine
+2. **Install Golang**: Ensure that Go is installed on your machine. You can download it from [golang.org](https://go.dev/dl/)
+3. **Setup**: Create a .env file in the project root and configure the necessary environment variables.
+4. **Install Dependencies**: Navigate to the project directory and install the required Go dependencies:
+
+```
+go mod tidy
+```
+
+5. **Setup Redis**:
+
+- Start a Redis instance locally or use Docker to run Redis.
+- Add a new key config:coturn with the following format:
 
 ```
 {
@@ -35,4 +43,9 @@ To use this project, follow this steps:
 }
 ```
 
-6. **Run the Service:** Now, you can run the service
+6. **Run the Service:** Start the application:
+
+```
+go run main.go
+
+```
