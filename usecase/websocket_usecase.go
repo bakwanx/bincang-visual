@@ -264,7 +264,7 @@ func (r *WebsocketUsecase) heartbeat(userId string) {
 				}
 			}
 
-			time.Sleep(45 * time.Second)
+			time.Sleep(10 * time.Second)
 		}
 	}()
 }
