@@ -7,14 +7,14 @@ type WebSocketMessage struct {
 	Payload json.RawMessage `json:"payload"`
 }
 
-type OfferPayload struct {
-	UserTarget User `json:"userTarget,omitempty"`
-	UserFrom   User `json:"userFrom,omitempty"`
-}
-
 type RequestOfferingPayload struct {
 	RoomId      string `json:"roomId"`
 	UserRequest *User  `json:"userRequest,omitempty"`
+}
+
+type OfferPayload struct {
+	UserTarget User `json:"userTarget,omitempty"`
+	UserFrom   User `json:"userFrom,omitempty"`
 }
 
 type SdpPayload struct {

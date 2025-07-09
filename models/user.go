@@ -5,9 +5,10 @@ import (
 )
 
 type User struct {
-	ID        string `json:"id"`
-	Username  string `json:"username"`
-	CreatedAt string `json:"createAt"`
+	ID              string `json:"id"`
+	Username        string `json:"username"`
+	CreatedAt       string `json:"createAt"`
+	IsCastingScreen bool   `json:"isCastingScreen"`
 }
 
 type UserClient struct {
