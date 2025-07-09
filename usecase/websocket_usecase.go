@@ -88,7 +88,9 @@ func (u *WebsocketUsecase) mainLogic(userId, roomId string, c *websocket.Conn) {
 		case "chat":
 			u.onChat(webSocketMessage, mt, msg, err)
 		case "leave":
-			u.onLeave(webSocketMessage, mt, msg, err)
+			u.onLeave(userId, roomId, mt, msg, err)
+		case "onCastScreen":
+			u.onCastScreen(webSocketMessage, mt, msg, err)
 		}
 
 		lock.Unlock()
@@ -201,21 +203,16 @@ func (r *WebsocketUsecase) onChat(webSocketMessage model.WebSocketMessage, mt in
 
 }
 
-func (r *WebsocketUsecase) onLeave(webSocketMessage model.WebSocketMessage, mt int, msg []byte, err error) {
+func (r *WebsocketUsecase) onLeave(userId, roomId string, mt int, msg []byte, err error) {
 
-	var leaveMeeting = model.LeaveMeetingPayload{}
-	if err := json.Unmarshal(webSocketMessage.Payload, &leaveMeeting); err != nil {
-		fmt.Println("Error unmarshalling sdp payload: ", err)
-	}
-
-	room, err := r.roomRepo.GetRoom(leaveMeeting.RoomId)
+	room, err := r.roomRepo.GetRoom(roomId)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	if room != nil {
 		for _, user := range room.Users {
-			if user.ID != leaveMeeting.User.ID {
+			if user.ID != userId {
 				if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
 					log.Println("error send message:", err)
 					ds.Clients[user.ID].Conn.Close()
@@ -223,12 +220,11 @@ func (r *WebsocketUsecase) onLeave(webSocketMessage model.WebSocketMessage, mt i
 				}
 			}
 		}
-		if err := r.roomRepo.RemoveUser(leaveMeeting.RoomId, leaveMeeting.User.ID); err != nil {
+		if err := r.roomRepo.RemoveUser(roomId, userId); err != nil {
 			fmt.Println(err)
 		}
 
 	}
-
 }
 
 func (r *WebsocketUsecase) heartbeat(userId string) {
@@ -267,4 +263,34 @@ func (r *WebsocketUsecase) heartbeat(userId string) {
 			time.Sleep(10 * time.Second)
 		}
 	}()
+}
+
+func (r *WebsocketUsecase) onCastScreen(webSocketMessage model.WebSocketMessage, mt int, msg []byte, err error) {
+
+	var leaveMeeting = model.LeaveMeetingPayload{}
+	if err := json.Unmarshal(webSocketMessage.Payload, &leaveMeeting); err != nil {
+		fmt.Println("Error unmarshalling sdp payload: ", err)
+	}
+
+	room, err := r.roomRepo.GetRoom(leaveMeeting.RoomId)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if room != nil {
+		for _, user := range room.Users {
+			if user.ID != leaveMeeting.User.ID {
+				if err = ds.Clients[user.ID].Conn.WriteMessage(mt, msg); err != nil {
+					log.Println("error send message:", err)
+					ds.Clients[user.ID].Conn.Close()
+					delete(ds.Clients, user.ID)
+				}
+			}
+		}
+		if err := r.roomRepo.RemoveUser(leaveMeeting.RoomId, leaveMeeting.User.ID); err != nil {
+			fmt.Println(err)
+		}
+
+	}
+
 }
