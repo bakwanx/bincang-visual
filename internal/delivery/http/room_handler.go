@@ -277,6 +277,26 @@ func (h *RoomHandler) GenerateRoomLink(c *fiber.Ctx) error {
 	})
 }
 
+func (h *RoomHandler) ValidateRoom(c *fiber.Ctx) error {
+	roomID := c.Params("roomId")
+	if roomID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Room ID is required",
+		})
+	}
+
+	room, err := h.roomUseCase.GetRoom(c.Context(), roomID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Room not found",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"data": room,
+	})
+}
+
 func generateQRCodeURL(link string) string {
 
 	return fmt.Sprintf("https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=%s",

@@ -128,6 +128,7 @@ func main() {
 	// ice servers (public or with optional auth)
 	api.Post("/rooms", roomHandler.CreateRoom)
 	api.Get("/rooms/:roomId", roomHandler.GetRoom)
+	api.Get("/rooms/:roomId/validate", roomHandler.ValidateRoom)
 	api.Get("/ice-servers", roomHandler.GetICEServers)
 
 	// protected routes (require JWT)
