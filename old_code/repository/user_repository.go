@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"bincang-visual/models"
+	"bincang-visual/old_code/models"
 	"bincang-visual/utils"
 	"context"
 	"encoding/json"

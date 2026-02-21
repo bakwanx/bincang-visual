@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"bincang-visual/models"
+	"bincang-visual/old_code/models"
 	"context"
 	"encoding/json"
 	"fmt"

@@ -1,9 +1,9 @@
 package httpdelivery
 
 import (
-	ds "bincang-visual/datasource"
-	"bincang-visual/models"
-	"bincang-visual/usecase"
+	ds "bincang-visual/old_code/datasource"
+	"bincang-visual/old_code/models"
+	"bincang-visual/old_code/usecase"
 	"bincang-visual/utils"
 
 	"github.com/gofiber/fiber/v2"

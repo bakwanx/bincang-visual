@@ -1,15 +1,15 @@
 package usecase
 
 import (
-	ds "bincang-visual/datasource"
-	"bincang-visual/repository"
+	ds "bincang-visual/old_code/datasource"
+	"bincang-visual/old_code/repository"
 	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
 	"time"
 
-	model "bincang-visual/models"
+	model "bincang-visual/old_code/models"
 
 	"github.com/gofiber/contrib/websocket"
 )
