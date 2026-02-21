@@ -97,10 +97,10 @@ func main() {
 		TimeZone:   "Local",
 	}))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
+		AllowOrigins:     "https://bakwanx.github.io",
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
-		AllowCredentials: false,
+		AllowCredentials: true,
 	}))
 
 	roomHandler := http.NewRoomHandler(roomUseCase, cfg.Server.BaseURL)
