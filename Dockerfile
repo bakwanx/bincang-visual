@@ -20,7 +20,7 @@ ADD . /app
 
 ## we run go build to compile the binary
 ## executable of our Go program
-RUN go build -o main .
+RUN go build -o /app/main .
 
 
 ## Our start command which kicks off
