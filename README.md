@@ -49,3 +49,49 @@ go mod tidy
 go run main.go
 
 ```
+
+backend/
+├── cmd/
+│ └── server/
+│ └── main.go
+├── internal/
+│ ├── domain/
+│ │ ├── entity/
+│ │ └── repository/
+│ ├── usecase/
+│ ├── delivery/
+│ │ ├── http/
+│ │ └── websocket/
+│ ├── repository/
+│ │ └── redis/
+│ └── infrastructure/
+│ ├── config/
+│ ├── middleware/
+│ └── webrtc/
+├── pkg/
+└── tests/
+
+lib/
+├── main.dart
+├── core/
+│ ├── error/
+│ ├── network/
+│ ├── usecases/
+│ └── utils/
+├── features/
+│ ├── meeting/
+│ │ ├── data/
+│ │ │ ├── datasources/
+│ │ │ ├── models/
+│ │ │ └── repositories/
+│ │ ├── domain/
+│ │ │ ├── entities/
+│ │ │ ├── repositories/
+│ │ │ └── usecases/
+│ │ └── presentation/
+│ │ ├── cubit/
+│ │ ├── pages/
+│ │ └── widgets/
+│ ├── auth/
+│ └── calendar/
+└── injection_container.dart
