@@ -31,7 +31,7 @@ func Run() error {
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_URL"),
-		Password: os.Getenv("REDIS_PASS"),
+		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0,
 	})
 

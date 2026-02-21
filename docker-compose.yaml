@@ -6,7 +6,7 @@ services:
   #   ports:
   #     - "6379:6379"
   #   environment:
-  #     - REDIS_PASS=${REDIS_PASS}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
   #   networks:
   #     - bincang_net
 
@@ -20,7 +20,7 @@ services:
       - 8080:8080
     environment:
       - REDIS_URL=redis:6379
-      - REDIS_PASS=${REDIS_PASS}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - PRIVATE_ENCRYPTOR_KEY=${PRIVATE_ENCRYPTOR_KEY}
       - IV_PRIVATE_ENCRYPTOR_KEY=${IV_PRIVATE_ENCRYPTOR_KEY}
       - ENV=${ENV}
