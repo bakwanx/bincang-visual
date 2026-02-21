@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"bincang-visual/models"
-	"bincang-visual/repository"
+	"bincang-visual/old_code/models"
+	"bincang-visual/old_code/repository"
 )
 
 type RoomUsecase struct {

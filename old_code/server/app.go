@@ -1,12 +1,12 @@
 package server
 
 import (
-	httpdelivery "bincang-visual/delivery/http_delivery"
-	websocketdelivery "bincang-visual/delivery/websocket_delivery"
-	"bincang-visual/repository"
+	httpdelivery "bincang-visual/old_code/delivery/http_delivery"
+	websocketdelivery "bincang-visual/old_code/delivery/websocket_delivery"
+	"bincang-visual/old_code/repository"
 	"context"
 
-	"bincang-visual/usecase"
+	"bincang-visual/old_code/usecase"
 	"fmt"
 	"os"
 

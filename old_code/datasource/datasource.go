@@ -1,7 +1,7 @@
 package datasource
 
 import (
-	model "bincang-visual/models"
+	model "bincang-visual/old_code/models"
 )
 
 var Clients = make(map[string]*model.UserClient)

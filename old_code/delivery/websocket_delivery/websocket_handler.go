@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	ds "bincang-visual/datasource"
-	"bincang-visual/usecase"
+	ds "bincang-visual/old_code/datasource"
+	"bincang-visual/old_code/usecase"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"

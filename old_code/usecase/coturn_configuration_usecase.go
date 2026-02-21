@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"bincang-visual/repository"
+	"bincang-visual/old_code/repository"
 )
 
 type CoturnConfigurationUsecase struct {
