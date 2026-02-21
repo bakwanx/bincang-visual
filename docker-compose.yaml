@@ -23,6 +23,12 @@ services:
       - REDIS_PASS=${REDIS_PASS}
       - PRIVATE_ENCRYPTOR_KEY=${PRIVATE_ENCRYPTOR_KEY}
       - IV_PRIVATE_ENCRYPTOR_KEY=${IV_PRIVATE_ENCRYPTOR_KEY}
+      - ENV=${ENV}
+      - TURN_URLS=${TURN_URLS}
+      - TURN_USERNAME=${TURN_USERNAME}
+      - TURN_SECRET=${TURN_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      
     restart: always
     # depends_on:
     #   - redis

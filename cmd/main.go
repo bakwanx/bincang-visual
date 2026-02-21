@@ -117,51 +117,51 @@ func main() {
 
 	api := app.Group("/api")
 
-	// Auth routes (public)
+	// auth routes (public)
 	auth := api.Group("/auth")
 	auth.Get("/google", authHandler.GoogleLogin)
 	auth.Get("/google/callback", authHandler.GoogleCallback)
 
-	// Direct token sign-in (for mobile)
+	// direct token sign-in (for mobile)
 	auth.Post("/google/signin", authHandler.GoogleTokenSignIn)
 
-	// ICE servers (public or with optional auth)
+	// ice servers (public or with optional auth)
 	api.Post("/rooms", roomHandler.CreateRoom)
 	api.Get("/rooms/:roomId", roomHandler.GetRoom)
 	api.Get("/ice-servers", roomHandler.GetICEServers)
 
-	// Protected routes (require JWT)
+	// protected routes (require JWT)
 	protected := api.Group("", middleware.JWTMiddleware(cfg.JWT.Secret))
 
-	// Auth - authenticated
+	// auth - authenticated
 	protected.Post("/auth/refresh", authHandler.RefreshToken)
 	protected.Get("/auth/me", authHandler.GetCurrentUser)
 
-	// Room management
+	// room management
 	protected.Get("/rooms/:roomId/participants", roomHandler.GetParticipants)
 	protected.Get("/rooms/:roomId/chat", roomHandler.GetChatHistory)
 	protected.Delete("/rooms/:roomId", roomHandler.DeleteRoom)
 
-	// Recording
+	// recording
 	protected.Post("/recordings/start", roomHandler.StartRecording)
 	protected.Post("/recordings/stop", roomHandler.StopRecording)
 	protected.Post("/recordings/upload-chunk", uploadHandler.UploadRecordingChunk)
 	protected.Get("/recordings/:recordingId", roomHandler.GetRecording)
 
-	// Calendar integration
+	// calendar integration
 	calendarRoutes := protected.Group("/calendar", middleware.OAuthMiddleware(redisClient))
 	calendarRoutes.Post("/schedule", calendarHandler.CreateScheduledMeeting)
 	calendarRoutes.Get("/upcoming", calendarHandler.GetUpcomingMeetings)
 	calendarRoutes.Delete("/:eventId", calendarHandler.CancelMeeting)
 
-	// Analytics
+	// analytics
 	protected.Get("/analytics/room/:roomId", analyticsHandler.GetRoomStatistics)
 	protected.Get("/analytics/user", analyticsHandler.GetUserStatistics)
 
-	// Storage (serve recording files)
+	// storage (serve recording files)
 	app.Static("/storage", cfg.Storage.LocalPath)
 
-	// WebSocket routes
+	// webSocket routes
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
@@ -170,8 +170,8 @@ func main() {
 		return fiber.ErrUpgradeRequired
 	})
 	app.Get("/ws/room/:roomId", websocket.New(func(c *websocket.Conn) {
-		// Get user info from query params or headers
-		// Use validate JWT token in production
+		// get user info from query params or headers
+		// use validate JWT token when auth has been implemented
 		roomID := c.Params("roomId")
 		userID := c.Query("userId")
 		displayName := c.Query("displayName")
@@ -189,7 +189,7 @@ func main() {
 		signalingHub.HandleWebSocket(c, roomID, userID, clientID, displayName)
 	}))
 
-	// Setup graceful shutdown
+	// setup graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
