@@ -68,7 +68,7 @@ func LoadConfig() (*Config, error) {
 		Server: ServerConfig{
 			Port:        getEnvAsInt("SERVER_PORT", 8080),
 			Host:        getEnv("SERVER_HOST", "0.0.0.0"),
-			BaseURL:     getEnv("BASE_URL", "http://192.168.1.68:8080"),
+			BaseURL:     getEnv("BASE_URL", "http://localhost:8080"),
 			Environment: getEnv("ENV", "development"),
 		},
 		Redis: RedisConfig{
