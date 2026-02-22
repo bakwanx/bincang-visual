@@ -10,13 +10,12 @@ import (
 )
 
 type Config struct {
-	Environment string
-	Server      ServerConfig
-	Redis       RedisConfig
-	JWT         JWTConfig
-	Google      GoogleConfig
-	TurnStun    TurnStunConfig
-	Storage     StorageConfig
+	Server   ServerConfig
+	Redis    RedisConfig
+	JWT      JWTConfig
+	Google   GoogleConfig
+	TurnStun TurnStunConfig
+	Storage  StorageConfig
 }
 
 type ServerConfig struct {
@@ -66,12 +65,11 @@ func LoadConfig() (*Config, error) {
 	json.Unmarshal([]byte(getEnv("TURN_URLS", "[example.com:your-port,example.com:your-port]")), &turnUrls)
 
 	config := &Config{
-		Environment: getEnv("ENV", ""),
 		Server: ServerConfig{
 			Port:        getEnvAsInt("SERVER_PORT", 8080),
 			Host:        getEnv("SERVER_HOST", "0.0.0.0"),
 			BaseURL:     getEnv("BASE_URL", "http://192.168.1.68:8080"),
-			Environment: getEnv("ENVIRONMENT", "development"),
+			Environment: getEnv("ENV", "development"),
 		},
 		Redis: RedisConfig{
 			Host:     getEnv("REDIS_HOST", "localhost"),
@@ -132,9 +130,9 @@ func getEnvAsInt(key string, defaultValue int) int {
 }
 
 func (c *Config) IsDevelopment() bool {
-	return c.Environment == "development"
+	return c.Server.Environment == "development"
 }
 
 func (c *Config) IsProduction() bool {
-	return c.Environment == "production"
+	return c.Server.Environment == "production"
 }

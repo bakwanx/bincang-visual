@@ -5,6 +5,7 @@ import (
 	"bincang-visual/internal/domain/entity"
 	"bincang-visual/internal/domain/usecase"
 	"fmt"
+	"log"
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
@@ -57,6 +58,7 @@ func (h *RoomHandler) CreateRoom(c *fiber.Ctx) error {
 		Settings:        req.Settings,
 	})
 	if err != nil {
+		log.Printf("[Handler] Failed to create room: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to create room",
 		})
@@ -80,6 +82,7 @@ func (h *RoomHandler) GetRoom(c *fiber.Ctx) error {
 
 	room, err := h.roomUseCase.GetRoom(c.Context(), roomID)
 	if err != nil {
+		log.Printf("[Handler] Room not found: %v", err)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Room not found",
 		})
@@ -94,6 +97,7 @@ func (h *RoomHandler) GetParticipants(c *fiber.Ctx) error {
 
 	participants, err := h.roomUseCase.GetParticipants(c.Context(), roomID)
 	if err != nil {
+		log.Printf("[Handler] Failed to get participants: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get participants",
 		})
@@ -109,6 +113,7 @@ func (h *RoomHandler) GetChatHistory(c *fiber.Ctx) error {
 
 	messages, err := h.roomUseCase.GetChatHistory(c.Context(), roomID, limit)
 	if err != nil {
+		log.Printf("[Handler] Failed to get chat history: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get chat history",
 		})
@@ -215,14 +220,14 @@ func (h *RoomHandler) GetICEServers(c *fiber.Ctx) error {
 	// TODO: generate short-lived TURN credentials
 	configuration := h.roomUseCase.GetConfiguration()
 	iceServers := []config.TurnStunConfig{
-		// {
-		// 	URLs: []string{
-		// 		"stun:stun.l.google.com:19302",
-		// 		"stun:stun1.l.google.com:19302",
-		// 		"stun:202.10.42.100:3478",
-		// 		"stun:stun.flashdance.cx:3478",
-		// 	},
-		// },
+		{
+			URLs: []string{
+				"stun:stun.l.google.com:19302",
+				"stun:stun1.l.google.com:19302",
+				"stun:202.10.42.100:3478",
+				"stun:stun.flashdance.cx:3478",
+			},
+		},
 		configuration,
 	}
 
@@ -241,12 +246,14 @@ func (h *RoomHandler) DeleteRoom(c *fiber.Ctx) error {
 
 	room, err := h.roomUseCase.GetRoom(c.Context(), roomID)
 	if err != nil {
+		log.Printf("[Handler] Room not found: %v", err)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Room not found",
 		})
 	}
 
 	if room.HostID != userID {
+		log.Printf("[Handler] Only host can delete the room: %v", err)
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error": "Only host can delete the room",
 		})
@@ -262,6 +269,7 @@ func (h *RoomHandler) GenerateRoomLink(c *fiber.Ctx) error {
 
 	room, err := h.roomUseCase.GetRoom(c.Context(), roomID)
 	if err != nil {
+		log.Printf("[Handler] Room not found: %v", err)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Room not found",
 		})
@@ -287,6 +295,7 @@ func (h *RoomHandler) ValidateRoom(c *fiber.Ctx) error {
 
 	room, err := h.roomUseCase.GetRoom(c.Context(), roomID)
 	if err != nil {
+		log.Printf("[Handler] Room not found: %v", err)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Room not found",
 		})
@@ -298,7 +307,6 @@ func (h *RoomHandler) ValidateRoom(c *fiber.Ctx) error {
 }
 
 func generateQRCodeURL(link string) string {
-
 	return fmt.Sprintf("https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=%s",
 		url.QueryEscape(link))
 }
