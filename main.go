@@ -96,12 +96,15 @@ func main() {
 		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   "Local",
 	}))
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "https://bakwanx.github.io",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
-		AllowCredentials: true,
-	}))
+
+	if cfg.IsProduction() {
+		app.Use(cors.New(cors.Config{
+			AllowOrigins:     "https://bincang-visual.cloud",
+			AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+			AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+			AllowCredentials: true,
+		}))
+	}
 
 	roomHandler := http.NewRoomHandler(roomUseCase, cfg.Server.BaseURL)
 	authHandler := http.NewAuthHandler(
