@@ -1,35 +1,35 @@
-name: Deploy
-on:
-  push:
-    branches:
-      - master
+# name: Deploy
+# on:
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/farhan/go/src/bincang-visual
-            git pull origin master
-            # go test -v ./..
+# jobs:
+#   build:
+#     name: Build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Deploy via SSH
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.SSH_HOST }}
+#           username: ${{ secrets.SSH_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           script: |
+#             cd /home/farhan/go/src/bincang-visual
+#             git pull origin master
+#             # go test -v ./..
 
-            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-            export PRIVATE_ENCRYPTOR_KEY=${{ secrets.PRIVATE_ENCRYPTOR_KEY }}
-            export IV_PRIVATE_ENCRYPTOR_KEY=${{ secrets.IV_PRIVATE_ENCRYPTOR_KEY }}
+#             export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+#             export PRIVATE_ENCRYPTOR_KEY=${{ secrets.PRIVATE_ENCRYPTOR_KEY }}
+#             export IV_PRIVATE_ENCRYPTOR_KEY=${{ secrets.IV_PRIVATE_ENCRYPTOR_KEY }}
 
-            # docker compose stop golang_app
-            # docker compose stop golang_app
-            # docker compose rm -f golang_app
+#             # docker compose stop golang_app
+#             # docker compose stop golang_app
+#             # docker compose rm -f golang_app
 
-            # docker compose build golang_app
-            # docker compose up -d --no-deps golang_app
+#             # docker compose build golang_app
+#             # docker compose up -d --no-deps golang_app
 
-            # only run for the first time (because it should run redis also)
-            docker compose down && docker compose up --build -d --remove-orphans
+#             # only run for the first time (because it should run redis also)
+#             docker compose down && docker compose up --build -d --remove-orphans
