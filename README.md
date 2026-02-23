@@ -3,7 +3,7 @@
 Bincang Visual is a web-based meeting platform built with Flutter and Go. It allows users to create meetings in seconds—no cost, no fees, and no login required. Simply create a new meeting and you’re ready to go!
 
 This project is still under development.
-You can try the live demo [here](https://bakwanx.github.io/bincang-visual-web/)
+You can try the live demo [here](https://bincang-visual.cloud)
 
 ## Setup Instructions
 
@@ -21,27 +21,6 @@ go mod tidy
 5. **Setup Redis**:
 
 - Start a Redis instance locally or use Docker to run Redis.
-- Add a new key config:coturn with the following format:
-
-```
-{
-    "iceServers": [
-        {
-            "urls": [
-                "turn:your-turn-server"
-            ],
-            "username": "",
-            "credential": ""
-        },
-        {
-            "urls": [
-                "stun:your-stun-server",
-                "stun:stun.flashdance.cx:3478" => example public STUN
-            ]
-        }
-    ]
-}
-```
 
 6. **Run the Service:** Start the application:
 
@@ -50,48 +29,25 @@ go run main.go
 
 ```
 
+## Project Structure
+
+```
 backend/
-├── cmd/
-│ └── server/
-│ └── main.go
 ├── internal/
 │ ├── domain/
 │ │ ├── entity/
-│ │ └── repository/
-│ ├── usecase/
+│ │ ├── repository/
+│ │ └── usecase/
 │ ├── delivery/
 │ │ ├── http/
 │ │ └── websocket/
 │ ├── repository/
+│ │ ├── calendar/
 │ │ └── redis/
-│ └── infrastructure/
+│ ├── infrastructure/
 │ ├── config/
-│ ├── middleware/
-│ └── webrtc/
+│ └── middleware/
 ├── pkg/
 └── tests/
 
-lib/
-├── main.dart
-├── core/
-│ ├── error/
-│ ├── network/
-│ ├── usecases/
-│ └── utils/
-├── features/
-│ ├── meeting/
-│ │ ├── data/
-│ │ │ ├── datasources/
-│ │ │ ├── models/
-│ │ │ └── repositories/
-│ │ ├── domain/
-│ │ │ ├── entities/
-│ │ │ ├── repositories/
-│ │ │ └── usecases/
-│ │ └── presentation/
-│ │ ├── cubit/
-│ │ ├── pages/
-│ │ └── widgets/
-│ ├── auth/
-│ └── calendar/
-└── injection_container.dart
+```
